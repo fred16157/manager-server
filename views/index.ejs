@@ -1,11 +1,64 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+
+<head>
+  <title><%= title %></title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="container" style="margin-top: 20px;">
+      <h2>책 등록</h2>
+      <form id="book-form">
+        <div class="form-group">
+          <label for="title">책 이름</label>
+          <input type="text" class="form-control" id="title" name="title" />
+        </div>
+        <div class="form-group">
+          <label for="author">저자</label>
+          <input type="text" class="form-control" id="author" name="author" />
+        </div>
+        <div class="form-group">
+          <label for="isbn">ISBN</label>
+          <input type="text" class="form-control" id="isbn" name="isbn" />
+        </div>
+        <div class="form-group">
+          <label for="published">출판일자</label>
+          <input type="text" class="form-control" id="published" name="publishedAt" placeholder="YYYY-MM-DD"/>
+        </div>
+        <div class="form-group">
+          <label for="image">이미지 링크</label>
+          <input type="text" class="form-control" id="image" name="imageUrl" />
+        </div>
+        <button type="submit" class="btn btn-primary">등록</button>
+      </form>
+  </div>
+  
+</body>
+
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+<script>
+  $("#book-form").submit(function(e) {
+    e.preventDefault();
+    var Data = {};
+    var formData = $("#book-form").serializeArray();
+    for(var d in formData)
+    {
+      Data[formData[d].name] = formData[d].value;
+    }
+    $.ajax({
+      type: "POST",
+      url: "/api/books/upload",
+      data: JSON.stringify(Data),
+      success: function() {},
+      dataType: "json",
+      contentType: "application/json" 
+    });
+  })
+</script>
+
 </html>
