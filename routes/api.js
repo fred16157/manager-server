@@ -41,9 +41,17 @@ router.get('/search/isbn/:q', function (req, res, next) {   //isbn으로 검색
     });
 });
 
+router.get('/search/tag/:q', function(req, res, next) {
+    Book.find({ tags: { $all: req.params.q.split(" ")}}, function(err, books) {
+        if(err) return res.status(500).json({error: "Database failure " + err});
+        if(books.length === 0) return res.status(404).json({error: "Not found"});
+        res.json(books);
+    });
+});
+
 router.delete('/books/delete/:id', function (req, res) {   //책 정보 삭제
     Book.findByIdAndDelete(req.params.id, function (err, resp) {
-        if (err) return res.status(500).json({ error: "Database failure" + err });
+        if (err) return res.status(500).json({ error: "Database failure " + err });
         res.json({ result: 1 });
         res.status(204).end();
     });
@@ -80,6 +88,7 @@ router.post('/books/upload', function (req, res, next) {  //책 정보 등록
     book.rentalLog = [];
     book.status = 1;
     book.imageUrl = req.body.imageUrl;
+    book.tags = req.body.tags;
 
     book.save(function (err) {
         if (err) {
