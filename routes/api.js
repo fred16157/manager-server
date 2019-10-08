@@ -41,8 +41,8 @@ router.get('/search/isbn/:q', function (req, res, next) {   //isbn으로 검색
     });
 });
 
-router.get('/search/tag/:q', function(req, res, next) {
-    Book.find({ tags: { $all: req.params.q.split(" ")}}, function(err, books) {
+router.get('/search/tag/:q', function(req, res, next) { //태그로 검색
+    Book.find({ tags: { $all: req.params.q.split(",")}}, function(err, books) {
         if(err) return res.status(500).json({error: "Database failure " + err});
         if(books.length === 0) return res.status(404).json({error: "Not found"});
         res.json(books);
@@ -76,6 +76,23 @@ router.put('/books/update/:id', function (req, res) {   //책 정보 갱신(도�
             if(err) return res.status(500).json({error: err});
             res.json({result: 1});
         });
+    });
+});
+
+router.get('/tags', function(req, res, next) {  //사용 가능한 태그 불러오기
+    var tags = {};
+    tags.list = [];
+    Book.find(function(err, books) {
+        books.forEach(function(book, i, arr){
+            for(var idx in book.tags)
+            {
+                if(!tags.list.includes(book.tags[idx]))
+                {
+                    tags.list.push(book.tags[idx]);
+                }
+            }
+        });
+        res.json(tags);
     });
 });
 

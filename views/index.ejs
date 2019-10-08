@@ -37,6 +37,11 @@
         </div>
         <button type="submit" class="btn btn-primary">등록</button>
       </form>
+
+      <h3>등록된 태그들</h3>
+      <% for(var tag in tags.list) { %>
+        <span class="badge badge-secondary" style="display: inline; margin-right: 5px;"><%= tags.list[tag] %></span>  
+      <% } %>
   </div>
   
 </body>
@@ -54,7 +59,7 @@
     {
       if(formData[d].name === "tags")
       {
-        Data[formData[d].name] = formData[d].value.trim().split(" ");
+        Data[formData[d].name] = formData[d].value.trim().split(",");
       }
       else 
       {

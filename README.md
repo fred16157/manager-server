@@ -26,6 +26,7 @@ publishedAt: String,  //출판일자
 rentalLog: [{ rentalAt: String, returnAt: String, userId: String }],    //대출 기록
 status: {type: Number, default: 1}, //대출상태 - 1이면 대출되지 않음, 0이면 누군가가 대출한 상태
 imageUrl: String    //책 이미지 링크
+tags: [String]  //태그
 ~~~
 
 사용 예시: 
@@ -49,6 +50,15 @@ GET http://example.com/api/search/title/책제목
 사용 예시:
 ~~~
 GET http://example.com/api/search/title/저자
+~~~
+
+### /search/tag/ - 태그로 찾기
+
+책의 태그를 통해 검색하는 API입니다. 태그 사이에 ','를 넣어 여러 태그를 조건으로 전달할 수 있습니다.
+
+사용 예시:
+~~~
+GET http://example.com/api/search/tag/태그1,태그2
 ~~~
 
 ### /search/isbn/ - ISBN으로 찾기
@@ -113,6 +123,7 @@ body:
         "author": "저자",
         "publishedAt": "YYYY-MM-DD",    //출판일자
         "imageUrl": "이미지 URL"
+        "tags: ["태그"];
     }
 }
 ~~~
