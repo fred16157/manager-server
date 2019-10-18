@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>회원가입</title>
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+ 
+
+    <!-- Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+
+    <!-- Latest compiled and minified Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+       
+    <style>
+        @import url("https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css");
+        @import url("https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css");
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -180px;
+            margin-top: -200px;
+            width: 360px;
+            height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>회원가입</h2>
+        <form id="signup-form">
+            <div class="form-group">
+                <label for="username">사용자 이름</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="사용자 이름" required>
+            </div>
+            <div class="form-group">
+                <label for="pass">비밀번호</label>
+                <input type="password" class="form-control" id="pass" name="password" placeholder="비밀번호" required>
+            </div>
+            <button type="submit" class="btn btn-primary">확인</button>
+        </form>
+    </div>
+    <script>
+            $("#signup-form").submit(function(e) {
+                e.preventDefault();
+                var data = $("#signup-form").serializeArray();
+                $.ajax({
+                    type: "POST",
+                    url: "/api/user/signup/",
+                    data: JSON.stringify(data),
+                    dataType: "json",
+                    contentType: "application/json"
+                });
+            });
+        </script>
+</body>
+</html>
