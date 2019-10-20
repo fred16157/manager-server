@@ -53,9 +53,9 @@ router.get('/search/tag/:q', function(req, res, next) { //태그로 검색
     });
 });
 
-router.delete('/admin/delete/:id', function (req, res) {   //책 정보 삭제
-    
-    Book.findByIdAndDelete(req.params.id, function (err, resp) {
+router.delete('/admin/delete/:pw', function (req, res) {   //책 정보 삭제
+    if(req.params.pw !== config.password) return res.status(403);
+    Book.findByIdAndDelete(req.body.id, function (err, resp) {
         if (err) return res.status(500).json({ error: "Database failure " + err });
         res.json({ result: 1 });
         res.status(204).end();
@@ -126,18 +126,30 @@ router.put('/books/rental/:id', function (req, res, next) {
 
 router.post('/books/return/', function (req, res, next) {
     var ticket = new Ticket();
-    ticket.logId = req.body.id;
+    ticket.bookId = req.body.bookId;
+    ticket.logId = req.body.logId;
+    ticket.userId = req.body.userId;
+    ticket.returnAt = new Date();
     ticket.save(function (err) {
         if(err) res.json({error: err});
-        return;
+        return res.json({result: 1, ticketId: ticket._id});
     });
 });
 
-router.post('/admin/ticket/', function (req, res, next) {
+router.get('/admin/tickets/:pw', function(req, res, next) {
+    if(req.params.pw !== config.password) return res.status(403);
+    Ticket.find(function(err, tickets) {
+        if(err) res.status(500).json({error: err});
+        res.json(tickets);
+    });
+})
+
+router.post('/admin/ticket/:pw', function (req, res, next) {
+    if(req.params.pw !== config.password) return res.status(403);
     Ticket.findByIdAndDelete(req.body.id, function(err, ticket) {
         if(req.body.isAccepted)
         {
-            Book.findOne({ "rentalLog._id": ticket.logId }, function(err, book){
+            Book.findById(ticket.bookId, function(err, book){
                 book.status = 1;
                 book.save(function(err) {
                     return res.status(500).json({error: err});

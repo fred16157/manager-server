@@ -47,6 +47,9 @@ db.once('open', function() {
     console.log("데이터베이스에 연결됨");
 });
 
+var fs = require('fs');
+global.config = JSON.parse(fs.readFileSync('config.json'));
+
 mongoose.connect('mongodb://localhost/book-manager');
 
 module.exports = app;
