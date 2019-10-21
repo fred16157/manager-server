@@ -112,7 +112,7 @@ router.put('/books/rental/:id', function (req, res, next) {
         if(err || book.status === 0) return res.status(500).json({error: err});
         book.rentalLog.push({
             rentalAt: req.body.rentalAt,
-            returnAt: req.body.rentalAt,
+            returnAt: req.body.returnAt,
             userId: req.body.userId
         });
         User.findById(req.body.userId, function (err, user) {
