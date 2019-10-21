@@ -30,7 +30,13 @@
     <div class="container">
         <small style="display: none" id="pw"><%=pw%></small>
         <h4>통계</h4>
-        
+        <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">응답코드별 요청 통계</h5>
+              <p class="card-text">요청의 응답코드별로 분류한 결과입니다.</p>
+            </div>
+            <canvas id="codeChart" class="card-img-bottom" width="400" height="200"></canvas>
+          </div>
         <h4>반납 대기열</h4>
         <div class="list-group list-group-flush">
             <% for(var i = 0; i < tickets.length; i++) { %>
@@ -50,9 +56,31 @@
             </div>
             <% } %>
         </div>
+
+        <h4>서버 로그</h4>
+        <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">시간</th>
+                <th scope="col">메소드</th>
+                <th scope="col">응답 코드</th>
+                <th scope="col">요청 경로</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% for(var i in log) { %>
+                    <tr>
+                    <td><%= moment(log[i].timestamp).fromNow() %></td>
+                    <td><%= log[i].method %></td>
+                    <td><%= log[i].code %></td>
+                    <td><%= log[i].route %></td>
+                    </tr>
+                    <% } %>
+            </tbody>
+          </table>
     </div>
 </body>
-
+<% var data = _data; %>
 <script>
     function reviewTicket(ticketId, isAccepted) {
         $.ajax({
@@ -69,6 +97,35 @@
             contentType: "application/json"
         });
     }
+
+    var codectx = $('#codeChart');
+    var codeChart = new Chart(codectx, {
+        type: 'bar',
+        data: {
+            labels: ['1XX', '2XX', '3XX', '4XX','5XX'],
+            datasets: [{
+                label: '요청 수',
+                data: [<%=data%>],
+                backgroundColor: [
+                    'rgba(255,204,255,0.2)',
+                    'rgba(0,204,102,0.2)',
+                    'rgba(0,153,255,0.2)',
+                    'rgba(255,255,0,0.2)',
+                    'rgba(204,0,0,0.2)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
 </script>
 
 </html>

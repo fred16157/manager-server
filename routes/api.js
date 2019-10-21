@@ -80,7 +80,7 @@ router.get('/tags', function(req, res, next) {  //사용 가능한 태그 불러
 
 router.post('/user/login', function(req, res, next) {
     User.findOne({username: req.body.username}, function(err, user) {
-        if(err) return user.status(500).json({error: err});
+        if(err) return res.status(500).json({error: err});
         if(user == null || user.password !== req.body.password) return res.status(404).json({error: "Not found"});
         return res.json({id: user._id});
     });
@@ -88,7 +88,14 @@ router.post('/user/login', function(req, res, next) {
 
 router.get('/user/info/:id', function(req, res, next) {
     User.findById(req.params.id, function(err, user) {
-        if(err) return user.status(500).json({error: err});
+        if(err) return res.status(500).json({error: err});
+    });
+});
+
+router.get('/admin/log/:pw', function(req, res, next) {
+    Log.find(function(err, logs) {
+        if(err) return res.status(500).json({error: err});
+        return res.json(logs);
     });
 });
 
@@ -180,6 +187,29 @@ router.post('/admin/ticket/:pw', function (req, res, next) {
         }
         return res.json({result: 1});
     });
+});
+
+router.post('/books/restore', function(req, res, next) {
+    for(var i in req.body)
+    {
+        var book = new Book();
+        book.isbn = req.body[i].isbn;
+        book.title = req.body[i].title;
+        book.author = req.body[i].author;
+        book.publishedAt = req.body[i].publishedAt;
+        book.rentalLog = [];
+        book.status = 1;
+        book.imageUrl = req.body[i].imageUrl;
+        book.tags = req.body[i].tags;
+        book.save(function (err) {
+            if (err) {
+                console.error(err);
+                res.json({ error: err });
+                return;
+            }
+            res.json({ result: 1 });
+        });
+    }
 });
 
 router.post('/books/upload', function (req, res, next) {  //책 정보 등록

@@ -2,8 +2,8 @@ var mongoose = require('mongoose');
 
 var LogSchema = new mongoose.Schema({
     timestamp: Date,
-    queryString: String,
-    queryMethod: String,
+    route: String,
+    method: String,
     code: Number
 });
 
