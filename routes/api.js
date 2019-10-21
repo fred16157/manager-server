@@ -2,8 +2,7 @@ var express = require('express');
 var Book = require('../models/book');
 var User = require('../models/user');
 var Ticket = require('../models/ticket');
-var passport = require('passport');
-var GoogleStrategy = require('passport-google-oauth20').Strategy;
+var Log = require('../models/log');
 var router = express.Router();
 
 router.get('/search', function (req, res, next) {    //검색
@@ -58,7 +57,7 @@ router.delete('/admin/delete/:pw', function (req, res) {   //책 정보 삭제
     Book.findByIdAndDelete(req.body.id, function (err, resp) {
         if (err) return res.status(500).json({ error: "Database failure " + err });
         res.json({ result: 1 });
-        res.status(204).end();
+        res.status(200).end();
     });
 });
 
@@ -87,6 +86,12 @@ router.post('/user/login', function(req, res, next) {
     });
 });
 
+router.get('/user/info/:id', function(req, res, next) {
+    User.findById(req.params.id, function(err, user) {
+        if(err) return user.status(500).json({error: err});
+    });
+});
+
 router.post('/user/signup', function(req, res, next) {
     var user = new User();
     user.username = req.body.username;
@@ -108,13 +113,14 @@ router.put('/books/rental/:id', function (req, res, next) {
         book.rentalLog.push({
             rentalAt: req.body.rentalAt,
             returnAt: req.body.rentalAt,
-            userId: req.body.id
+            userId: req.body.userId
         });
-        User.findById(req.body.id, function (err, user) {
+        User.findById(req.body.userId, function (err, user) {
             if(err) return res.status(500).json({error: err});
            user.rentalLog.push({
                 bookId: req.params.id,
-                logId: book.rentalLog[book.rentalLog.length - 1]._id
+                logId: book.rentalLog[book.rentalLog.length - 1]._id,
+                isReturned: false
            }); 
         });
         book.status = 0;
@@ -122,6 +128,7 @@ router.put('/books/rental/:id', function (req, res, next) {
             if(err) return res.status(500).json({error: err});
         });
     });
+    res.status(200).json({result: 1});
 });
 
 router.post('/books/return/', function (req, res, next) {
@@ -147,13 +154,28 @@ router.get('/admin/tickets/:pw', function(req, res, next) {
 router.post('/admin/ticket/:pw', function (req, res, next) {
     if(req.params.pw !== config.password) return res.status(403);
     Ticket.findByIdAndDelete(req.body.id, function(err, ticket) {
+        if(err) return res.status(500).json({error: err});
         if(req.body.isAccepted)
         {
             Book.findById(ticket.bookId, function(err, book){
+                if(err) return res.status(500).json({error: err});
                 book.status = 1;
                 book.save(function(err) {
-                    return res.status(500).json({error: err});
+                    if(err) return res.status(500).json({error: err});
                 });
+            });
+            User.findById(ticket.userId, function (err, user) {
+                if(err) return res.status(500).json({error: err});
+                for(var i in user.rentalLog)
+                {
+                    if(user.rentalLog[i].logId = ticket.logId)
+                    {
+                        user.rentalLog[i].isReturned = true;
+                    }
+                    user.save(function (err) {
+                        if(err) return res.status(500).json({error: err});
+                    });
+                }
             });
         }
         return res.json({result: 1});

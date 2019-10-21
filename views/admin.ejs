@@ -8,9 +8,7 @@
         integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"></script>
@@ -30,7 +28,7 @@
 
 <body>
     <div class="container">
-
+        <small style="display: none" id="pw"><%=pw%></small>
         <h4>통계</h4>
         <div class="card-deck">
             <div class="card mb-3">
@@ -58,14 +56,36 @@
                     <h5 class="mb-1"><%= tickets[i]._id %></h5>
                     <small><%= tickets[i].returnAt %></small>
                 </div>
-                <p class="mb-1">로그 ID - <%= tickets[i].logId %><br>책 ID - <%= tickets[i].bookId %><br>유저 ID - <%= tickets[i].userId %></p>
+                <p class="mb-1">로그 ID - <%= tickets[i].logId %><br>책 ID - <%= tickets[i].bookId %><br>유저 ID -
+                    <%= tickets[i].userId %></p>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" onclick="reviewTicket('<%=tickets[i]._id%>', true)"
+                        class="btn btn-primary">승인</button>
+                    <button type="button" onclick="reviewTicket('<%=tickets[i]._id%>', false)"
+                        class="btn btn-danger">거절</button>
+                </div>
             </div>
             <% } %>
         </div>
     </div>
 </body>
 
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
 <script>
+    function reviewTicket(ticketId, isAccepted) {
+        $.ajax({
+            type: "POST",
+            url: "/api/admin/ticket/" + $('#pw').text(),
+            data: JSON.stringify({id: ticketId, isAccepted: isAccepted}),
+            success: function () { 
+                location.reload();
+            },
+            dataType: "json",
+            contentType: "application/json"
+        });
+    }
+
     var ctx = document.getElementById('myChart');
     var myChart = new Chart(ctx, {
         type: 'bar',

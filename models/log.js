@@ -4,8 +4,7 @@ var LogSchema = new mongoose.Schema({
     timestamp: Date,
     queryString: String,
     queryMethod: String,
-    code: Number,
-    isError: Boolean
+    code: Number
 });
 
 module.exports = mongoose.model("log", LogSchema);

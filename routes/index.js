@@ -28,8 +28,12 @@ router.get('/signup/', function(req, res, next) {
 router.get('/admin/:pw', function(req, res, next) {
     if(req.params.pw !== config.password) return res.status(403);
     Ticket.find(function (err, tickets) {
-        if(err) return res.status(500);
-        res.render('admin', {tickets: tickets});
+        if(err) return res.status(500).json({error: err});
+        // Log.find(function (err, logs) {
+        //     if(err) return res.status(500).json({error: err});
+        //     res.render('admin', {tickets: tickets, logs: logs});
+        // });
+        res.render('admin', {tickets: tickets, pw: config.password});
     });
 });
 module.exports = router;
