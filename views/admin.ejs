@@ -53,14 +53,15 @@
     </div>
 </body>
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-
 <script>
     function reviewTicket(ticketId, isAccepted) {
         $.ajax({
             type: "POST",
             url: "/api/admin/ticket/" + $('#pw').text(),
             data: JSON.stringify({id: ticketId, isAccepted: isAccepted}),
+            error: function(req, status, err) {
+                console.log(err);
+            },
             success: function () { 
                 location.reload();
             },
