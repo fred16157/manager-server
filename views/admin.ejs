@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 페이지</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"
+        integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <style>
+        .container {
+            padding: 20px;
+        }
+
+        h4 {
+            margin: 10px 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <small style="display: none" id="pw"><%=pw%></small>
+        <h4>통계</h4>
+        <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">응답코드별 요청 통계</h5>
+              <p class="card-text">요청의 응답코드별로 분류한 결과입니다.</p>
+            </div>
+            <canvas id="codeChart" class="card-img-bottom" width="400" height="200"></canvas>
+          </div>
+          <div class="card mb-3">
+              <div class="card-body">
+                  <h5 class="card-title">메소드별 요청 통계</h5>
+                  <p class="card-text">요청의 메소드별로 분류한 결과입니다.</p>
+              </div>
+              <canvas id="methodChart" class="card-img-bottom" width="400" height="200"></canvas>
+          </div>
+        <h4>반납 대기열</h4>
+        <div class="list-group list-group-flush">
+            <% for(var i = 0; i < tickets.length; i++) { %>
+            <div class="list-group-item flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1"><%= tickets[i]._id %></h5>
+                    <small><%= tickets[i].returnAt %></small>
+                </div>
+                <p class="mb-1">로그 ID - <%= tickets[i].logId %><br>책 ID - <%= tickets[i].bookId %><br>유저 ID -
+                    <%= tickets[i].userId %></p>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" onclick="reviewTicket('<%=tickets[i]._id%>', true)"
+                        class="btn btn-primary">승인</button>
+                    <button type="button" onclick="reviewTicket('<%=tickets[i]._id%>', false)"
+                        class="btn btn-danger">거절</button>
+                </div>
+            </div>
+            <% } %>
+        </div>
+
+        <h4>서버 로그</h4>
+        <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">시간</th>
+                <th scope="col">메소드</th>
+                <th scope="col">응답 코드</th>
+                <th scope="col">요청 경로</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% for(var i in log) { %>
+                    <tr>
+                    <td><%= moment(log[i].timestamp).fromNow() %></td>
+                    <td><%= log[i].method %></td>
+                    <td><%= log[i].code %></td>
+                    <td><%= log[i].route %></td>
+                    </tr>
+                    <% } %>
+            </tbody>
+          </table>
+    </div>
+</body>
+<% 
+    var codedata = _codedata; 
+    var methoddata = _methoddata;
+%>
+<script>
+    function reviewTicket(ticketId, isAccepted) {
+        $.ajax({
+            type: "POST",
+            url: "/api/admin/ticket/" + $('#pw').text(),
+            data: JSON.stringify({id: ticketId, isAccepted: isAccepted}),
+            error: function(req, status, err) {
+                console.log(err);
+            },
+            success: function () { 
+                location.reload();
+            },
+            dataType: "json",
+            contentType: "application/json"
+        });
+    }
+
+    var codectx = $('#codeChart');
+    var codeChart = new Chart(codectx, {
+        type: 'bar',
+        data: {
+            labels: ['1XX', '2XX', '3XX', '4XX','5XX'],
+            datasets: [{
+                label: '요청 수',
+                data: [<%=codedata%>],
+                backgroundColor: [
+                    'rgba(255,204,255,0.2)',
+                    'rgba(0,204,102,0.2)',
+                    'rgba(0,153,255,0.2)',
+                    'rgba(255,255,0,0.2)',
+                    'rgba(204,0,0,0.2)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    var methodctx = $('#methodChart');
+    var methodChart = new Chart(methodctx, {
+        type: 'bar',
+        data: {
+            labels: ['GET', 'POST', 'PUT', 'DELETE'],
+            datasets: [{
+                label: '요청 수',
+                data: [<%=methoddata%>],
+                backgroundColor: [
+                    'rgba(255,204,255,0.2)',
+                    'rgba(0,204,102,0.2)',
+                    'rgba(0,153,255,0.2)',
+                    'rgba(255,255,0,0.2)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+
+</html>

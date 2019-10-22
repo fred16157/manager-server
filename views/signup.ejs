@@ -52,11 +52,14 @@
     <script>
             $("#signup-form").submit(function(e) {
                 e.preventDefault();
+                var form = {};
                 var data = $("#signup-form").serializeArray();
+                form.username = data[0].value;
+                form.password = data[1].value;
                 $.ajax({
                     type: "POST",
                     url: "/api/user/signup/",
-                    data: JSON.stringify(data),
+                    data: JSON.stringify(form),
                     dataType: "json",
                     contentType: "application/json"
                 });

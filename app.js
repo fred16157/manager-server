@@ -2,7 +2,7 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+var morgan = require('morgan');
 
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
@@ -13,7 +13,26 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.use(logger('dev'));
+//var logger = morgan('dev');
+var Log = require('./models/log');
+
+
+var logger = function(req, res, next) {
+  var log = new Log();
+  log.timestamp = new Date();
+  log.method = req.method;
+  log.route = req.url;
+  res.on('finish', function() {
+    log.code = res.statusCode;
+    console.log(log.timestamp + " " + req.method + " " + req.url + " " + res.statusCode);
+    log.save(function(err) {
+      if(err) return console.log(err);
+    });
+  });
+  next();
+}
+
+app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -45,8 +64,14 @@ db.on('error', console.error);
 
 db.once('open', function() {
     console.log("데이터베이스에 연결됨");
+    Log.remove({}, function(err){
+      if(err) return console.log(err);
+    });
 });
 
-mongoose.connect('mongodb://localhost/book-manager');
+var fs = require('fs');
+global.config = JSON.parse(fs.readFileSync('config.json'));
+
+mongoose.connect('mongodb://localhost/book_manager');
 
 module.exports = app;
