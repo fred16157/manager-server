@@ -37,6 +37,13 @@
             </div>
             <canvas id="codeChart" class="card-img-bottom" width="400" height="200"></canvas>
           </div>
+          <div class="card mb-3">
+              <div class="card-body">
+                  <h5 class="card-title">메소드별 요청 통계</h5>
+                  <p class="card-text">요청의 메소드별로 분류한 결과입니다.</p>
+              </div>
+              <canvas id="methodChart" class="card-img-bottom" width="400" height="200"></canvas>
+          </div>
         <h4>반납 대기열</h4>
         <div class="list-group list-group-flush">
             <% for(var i = 0; i < tickets.length; i++) { %>
@@ -80,7 +87,10 @@
           </table>
     </div>
 </body>
-<% var data = _data; %>
+<% 
+    var codedata = _codedata; 
+    var methoddata = _methoddata;
+%>
 <script>
     function reviewTicket(ticketId, isAccepted) {
         $.ajax({
@@ -105,13 +115,41 @@
             labels: ['1XX', '2XX', '3XX', '4XX','5XX'],
             datasets: [{
                 label: '요청 수',
-                data: [<%=data%>],
+                data: [<%=codedata%>],
                 backgroundColor: [
                     'rgba(255,204,255,0.2)',
                     'rgba(0,204,102,0.2)',
                     'rgba(0,153,255,0.2)',
                     'rgba(255,255,0,0.2)',
                     'rgba(204,0,0,0.2)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    var methodctx = $('#methodChart');
+    var methodChart = new Chart(methodctx, {
+        type: 'bar',
+        data: {
+            labels: ['GET', 'POST', 'PUT', 'DELETE'],
+            datasets: [{
+                label: '요청 수',
+                data: [<%=methoddata%>],
+                backgroundColor: [
+                    'rgba(255,204,255,0.2)',
+                    'rgba(0,204,102,0.2)',
+                    'rgba(0,153,255,0.2)',
+                    'rgba(255,255,0,0.2)'
                 ],
                 borderWidth: 1
             }]
