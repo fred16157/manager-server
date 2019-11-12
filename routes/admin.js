@@ -15,6 +15,7 @@ router.delete('/delete/:pw', function (req, res) {   //책 정보 삭제
 });
 
 router.get('/log/:pw', function(req, res, next) {
+    if(req.params.pw !== config.password) return res.status(403);
     Log.find(function(err, logs) {
         if(err) return res.status(500).json({error: err});
         return res.json(logs);
