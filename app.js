@@ -43,10 +43,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
-app.use('/books', booksRouter);
-app.use('/search', searchRouter);
-app.use('/user', userRouter);
-app.use('/admin', adminRouter);
+app.use('/api/books', booksRouter);
+app.use('/api/search', searchRouter);
+app.use('/api/user', userRouter);
+app.use('/api/admin', adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -78,6 +78,6 @@ db.once('open', function() {
 var fs = require('fs');
 global.config = JSON.parse(fs.readFileSync('config.json'));
 
-mongoose.connect('mongodb://ubuntu@ec2-13-209-89-75.ap-northeast-2.compute.amazonaws.com/book-manager');
+mongoose.connect('mongodb://localhost/book-manager');
 
 module.exports = app;
