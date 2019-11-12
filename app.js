@@ -6,6 +6,10 @@ var morgan = require('morgan');
 
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
+var booksRouter = require('./routes/books');
+var searchRouter = require('./routes/search');
+var userRouter = require('./routes/user');
+var adminRouter = require('./routes/admin');
 
 var app = express();
 
@@ -15,7 +19,6 @@ app.set('view engine', 'ejs');
 
 //var logger = morgan('dev');
 var Log = require('./models/log');
-
 
 var logger = function(req, res, next) {
   var log = new Log();
@@ -40,6 +43,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
+app.use('/books', booksRouter);
+app.use('/search', searchRouter);
+app.use('/user', userRouter);
+app.use('/admin', adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -58,7 +65,6 @@ app.use(function(err, req, res, next) {
 });
 
 var mongoose = require("mongoose");
-var Book = require('./models/book');
 var db = mongoose.connection;
 db.on('error', console.error);
 
@@ -72,6 +78,6 @@ db.once('open', function() {
 var fs = require('fs');
 global.config = JSON.parse(fs.readFileSync('config.json'));
 
-mongoose.connect('mongodb://localhost/book_manager');
+mongoose.connect('mongodb://ubuntu@ec2-13-209-89-75.ap-northeast-2.compute.amazonaws.com/book-manager');
 
 module.exports = app;

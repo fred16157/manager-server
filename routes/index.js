@@ -31,6 +31,9 @@ router.get('/admin/:pw', function(req, res, next) {
     Ticket.find(function (err, tickets) {
         if(err) return res.status(500).json({error: err});
         Log.find(function (err, logs) {
+            logs = logs.sort(function (a, b) {
+                return b.timestamp - a.timestamp; 
+            });
             if(err) return res.status(500).json({error: err});
             var codedata = [0,0,0,0,0];
             var methoddata = [0,0,0,0];
