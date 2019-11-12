@@ -18,18 +18,26 @@ router.get('/info/:id', function(req, res, next) {
 });
 
 router.post('/signup', function(req, res, next) {
-    var user = new User();
-    user.username = req.body.username;
-    user.password = req.body.password;
-    user.rentalLog = [];
-    user.save(function (err) {
-        if (err) {
-            console.error(err);
-            res.json({ error: err });
-            return;
-        }
-        res.json({ result: 1 });
+    if(req.body.username === '' || typeof req.body.username === 'undefined' || 
+        req.body.password === '' || typeof req.body.password === 'undefined') return res.status(400).json({error: "No username or password"});
+    User.exists({username: req.body.username}, function(err, result) {
+        if(err) return res.json({error: err});
+        if(result) return res.status(500).json({error: "User already exists"});
+        var user = new User();
+
+        user.username = req.body.username;
+        user.password = req.body.password;
+        user.rentalLog = [];
+        user.save(function (err) {
+            if (err) {
+                console.error(err);
+                res.json({ error: err });
+                return;
+            }
+            res.json({ result: 1 });
+        });
     });
+        
 });
 
 module.exports = router;

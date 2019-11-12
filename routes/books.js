@@ -45,7 +45,8 @@ router.post('/return/', function (req, res, next) {
     });
 });
 
-router.post('/upload', function (req, res, next) {  //책 정보 등록
+router.post('/upload/:pw', function (req, res, next) {  //책 정보 등록
+    if(req.params.pw !== config.password) return res.status(403);
     var book = new Book();
     book.isbn = req.body.isbn;
     book.title = req.body.title;

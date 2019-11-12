@@ -19,6 +19,6 @@ var UserSchema = new mongoose.Schema({
     username: {type: String, unique: true},
     password: {type: String, get: encrypt, set: decrypt},
     rentalLog: [{bookId: String, logId: String, isReturned: false},]
-},  {timestamps: {createdAt: "rentalAt"}});
+},  {timestamps: {createdAt: "createdAt"}});
 
 module.exports = mongoose.model('user', UserSchema);
